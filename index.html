@@ -1,94 +1,142 @@
 import React, { useState } from "react";
 
-const quizData = [
-  { question: "What is Brevis Network known for?", options: ["AI Models", "ZK Data Verification", "NFT Market", "Layer 1 Blockchain"], answer: "ZK Data Verification" },
-  { question: "Which technology powers Brevis?", options: ["ZK Proofs", "AI", "VR", "IoT"], answer: "ZK Proofs" },
-  { question: "Brevis helps developers with?", options: ["Gaming tools", "On-chain data access", "Cloud storage", "Image editing"], answer: "On-chain data access" },
-  { question: "Who can use Brevis SDK?", options: ["Only enterprises", "Anyone building dApps", "Only students", "Only investors"], answer: "Anyone building dApps" },
-  { question: "Which ecosystem supports Brevis?", options: ["Ethereum", "Polygon", "Both", "None"], answer: "Both" },
-  { question: "What makes Brevis unique?", options: ["Fast transactions", "Zero-Knowledge proofs", "Low gas fees", "AI Integration"], answer: "Zero-Knowledge proofs" },
-  { question: "Does Brevis focus on privacy?", options: ["Yes", "No", "Sometimes", "Not Sure"], answer: "Yes" },
-  { question: "Is Brevis open-source?", options: ["Yes", "No"], answer: "Yes" },
-  { question: "What layer does Brevis operate on?", options: ["Layer 1", "Layer 2", "Cross-layer"], answer: "Cross-layer" },
-  { question: "Brevis Network official website?", options: ["brevis.io", "blog.brevis.network", "brevischain.com", "zkbrevis.org"], answer: "blog.brevis.network" },
-  { question: "Which part of blockchain does Brevis optimize?", options: ["Frontend", "Computation layer", "UX", "Storage"], answer: "Computation layer" },
-  { question: "Who benefits from Brevis?", options: ["Developers", "Users", "Enterprises", "All of the above"], answer: "All of the above" },
-  { question: "Brevis mission focuses on?", options: ["Gaming", "Trustless computation", "AI Art", "NFT Design"], answer: "Trustless computation" },
-  { question: "Does Brevis support zkSNARKs?", options: ["Yes", "No"], answer: "Yes" },
-  { question: "Where can you learn more about Brevis?", options: ["Twitter", "Discord", "blog.brevis.network", "All of these"], answer: "All of these" },
+const questions = [
+  { question: "What is Brevis Network?", options: ["A gaming project", "A ZK data verification platform", "An NFT marketplace", "A social media app"], answer: "A ZK data verification platform" },
+  { question: "Which technology powers Brevis Network?", options: ["Zero Knowledge Proofs", "AI Bots", "Smart NFTs", "IoT Systems"], answer: "Zero Knowledge Proofs" },
+  { question: "What is the main focus of Brevis?", options: ["DeFi loans", "Verifiable computation and privacy", "Memecoin trading", "AI art creation"], answer: "Verifiable computation and privacy" },
+  { question: "Brevis enables applications to access what type of data?", options: ["Off-chain data", "On-chain verified data", "Random external files", "Private user chats"], answer: "On-chain verified data" },
+  { question: "Where can you read about Brevis updates?", options: ["blog.brevis.network", "reddit.com/brevis", "facebook.com/brevis", "medium.com/brevis"], answer: "blog.brevis.network" },
+  { question: "Who are the primary users of Brevis SDK?", options: ["Developers", "Gamers", "Streamers", "Artists"], answer: "Developers" },
+  { question: "Which ecosystem does Brevis support?", options: ["Only Ethereum", "Multi-chain (Ethereum, Polygon, etc.)", "Only Solana", "Only Binance Chain"], answer: "Multi-chain (Ethereum, Polygon, etc.)" },
+  { question: "What layer does Brevis primarily operate on?", options: ["Layer 1", "Layer 2", "Cross Layer", "App Layer"], answer: "Cross Layer" },
+  { question: "What kind of proofs does Brevis use?", options: ["zkSNARKs", "zkRollup", "zkMESH", "zkWASM"], answer: "zkSNARKs" },
+  { question: "What is the end goal of Brevis?", options: ["Trustless computation", "Centralized analytics", "Trading bots", "AI assistants"], answer: "Trustless computation" },
+  { question: "Is Brevis open source?", options: ["Yes", "No"], answer: "Yes" },
+  { question: "What powers Brevis verification system?", options: ["ZK cryptography", "Data mining", "GPU rendering", "Cloud computing"], answer: "ZK cryptography" },
+  { question: "Brevis helps developers prove what?", options: ["Any data truthfully without revealing everything", "Social media followers", "Game scores", "Image filters"], answer: "Any data truthfully without revealing everything" },
+  { question: "Which term defines Brevis data layer?", options: ["Proof-of-Data", "Zero-Layer", "Smart-Layer", "Meta-Layer"], answer: "Proof-of-Data" },
+  { question: "What is the main vision of Brevis Network?", options: ["To enable trustless, verifiable computation for all apps", "To create gaming metaverse", "To build meme tokens", "To automate NFTs"], answer: "To enable trustless, verifiable computation for all apps" },
+];
+
+const colors = [
+  "text-blue-700", "text-green-700", "text-purple-700",
+  "text-pink-700", "text-orange-700", "text-indigo-700",
+  "text-teal-700", "text-rose-700", "text-cyan-700"
 ];
 
 export default function App() {
-  const [index, setIndex] = useState(-1);
+  const [currentQuestion, setCurrentQuestion] = useState(-1);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState("");
+  const [locked, setLocked] = useState(false);
 
-  const startQuiz = () => setIndex(0);
   const handleAnswer = (option) => {
-    setSelected(option);
-    if (option === quizData[index].answer) setScore(score + 1);
-    setTimeout(() => {
-      setSelected("");
-      if (index + 1 < quizData.length) setIndex(index + 1);
-      else setIndex(quizData.length);
-    }, 700);
+    if (locked) return;
+    setSelectedOption(option);
+    setLocked(true);
+    if (option === questions[currentQuestion].answer) {
+      setScore(score + 1);
+    }
   };
-  const resetQuiz = () => {
-    setIndex(-1);
+
+  const nextQuestion = () => {
+    setSelectedOption(null);
+    setLocked(false);
+    if (currentQuestion + 1 < questions.length) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      setCurrentQuestion(questions.length);
+    }
+  };
+
+  const restartQuiz = () => {
+    setCurrentQuestion(-1);
     setScore(0);
+    setSelectedOption(null);
+    setLocked(false);
+  };
+
+  const getTrophy = () => {
+    if (score >= 12) return "🥇 Gold Trophy - Brevis Expert!";
+    if (score >= 8) return "🥈 Silver Trophy - Great Job!";
+    return "🔁 Try Again - Keep Learning!";
   };
 
   return (
-    <div style={{ backgroundColor: "white", minHeight: "100vh" }} className="flex flex-col items-center justify-center text-gray-800 px-4">
-      {index === -1 ? (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-800 p-4">
+      {currentQuestion === -1 ? (
         <div className="text-center">
-          <img src="/brevis.png" alt="Brevis Logo" className="w-24 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-blue-700 mb-2">🔥 Welcome to Brevis Quiz 🔥</h1>
-          <p className="text-lg mb-6">Learn about the Brevis Network 🚀</p>
-          <button onClick={startQuiz} className="bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition">
+          <h1 className="text-5xl font-extrabold text-blue-700 mb-4">🎯 Brevis Network Quiz 🎯</h1>
+          <p className="text-lg mb-6 font-medium">
+            Learn about the <strong>Brevis Network</strong> and explore its ZK-powered world!
+          </p>
+          <button
+            onClick={() => setCurrentQuestion(0)}
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-blue-700 transition font-semibold"
+          >
             Start Quiz
           </button>
         </div>
-      ) : index < quizData.length ? (
-        <div className="text-center">
-          <img src="/brevis.png" alt="Brevis Logo" className="w-16 mx-auto mb-3" />
-          <h2 className="text-xl font-semibold mb-2">
-            Question {index + 1} / {quizData.length}
+      ) : currentQuestion < questions.length ? (
+        <div className="w-full max-w-xl text-center">
+          <h2 className={`text-2xl font-bold mb-6 ${colors[currentQuestion % colors.length]}`}>
+            {currentQuestion + 1}. {questions[currentQuestion].question}
           </h2>
-          <p className="text-2xl mb-5">{quizData[index].question}</p>
           <div className="grid gap-3">
-            {quizData[index].options.map((opt, i) => (
+            {questions[currentQuestion].options.map((opt, i) => (
               <button
                 key={i}
                 onClick={() => handleAnswer(opt)}
-                className={`px-6 py-3 rounded-xl border text-lg ${
-                  selected
-                    ? opt === quizData[index].answer
+                disabled={locked}
+                className={`px-5 py-3 rounded-xl border text-lg font-medium transition ${
+                  selectedOption
+                    ? opt === questions[currentQuestion].answer
                       ? "bg-green-500 text-white"
-                      : opt === selected
+                      : opt === selectedOption
                       ? "bg-red-500 text-white"
-                      : "bg-white"
-                    : "hover:bg-blue-50"
+                      : "bg-white text-black"
+                    : "bg-white hover:bg-blue-50 text-black"
                 }`}
               >
                 {String.fromCharCode(65 + i)}. {opt}
               </button>
             ))}
           </div>
+
+          {locked && (
+            <p className="mt-3 text-sm text-gray-600">
+              ✅ Correct Answer: <strong>{questions[currentQuestion].answer}</strong>
+            </p>
+          )}
+
+          <button
+            onClick={nextQuestion}
+            className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition"
+          >
+            {currentQuestion + 1 === questions.length ? "Finish" : "Next"}
+          </button>
         </div>
       ) : (
         <div className="text-center">
-          <img src="/brevis.png" alt="Brevis Logo" className="w-24 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-2">Quiz Completed 🎉</h2>
-          <p className="text-xl mb-4">Your Score: {score} / {quizData.length}</p>
-          <p className="text-lg text-gray-700 mb-4">
-            💡 Brevis Network is revolutionizing on-chain data access using <strong>Zero-Knowledge Proofs</strong>.<br />
-            Learn more:{" "}
-            <a href="https://blog.brevis.network" target="_blank" rel="noreferrer" className="text-blue-600 underline">
+          <h2 className="text-4xl font-bold mb-3">🎉 Quiz Completed!</h2>
+          <p className="text-xl mb-2 font-semibold">Your Score: {score} / {questions.length}</p>
+          <p className="text-2xl mb-4">{getTrophy()}</p>
+          <p className="text-gray-700 mb-6">
+            💡 Brevis Network is pioneering <strong>trustless, verifiable computation</strong> using ZK tech.<br />
+            Learn more at 👉{" "}
+            <a
+              href="https://blog.brevis.network"
+              target="_blank"
+              rel="noreferrer"
+              className="text-blue-600 underline"
+            >
               blog.brevis.network
             </a>
           </p>
-          <button onClick={resetQuiz} className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">
+          <button
+            onClick={restartQuiz}
+            className="bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition"
+          >
             Retry Quiz
           </button>
         </div>
