@@ -2,185 +2,177 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Brevis Network Quiz</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
       background-color: white;
-      color: #222;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .welcome {
+      font-family: 'Poppins', sans-serif;
       text-align: center;
-      margin-top: 100px;
-      animation: fadeIn 1.5s ease-in-out;
+      padding: 20px;
     }
-    .welcome h1 {
-      font-size: 2.2rem;
-      color: #1e40af;
+    #logo {
+      width: 100px;
+      margin-top: 20px;
     }
-    .welcome p {
-      font-size: 1.1rem;
-      color: #444;
+    h1 {
+      color: #000;
+      font-size: 2.3em;
+      font-weight: 700;
+      margin-bottom: 5px;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #0284c7;
-      color: white;
+    .question {
+      font-size: 1.3em;
       font-weight: bold;
+      margin: 20px 0;
+    }
+    .option {
+      display: block;
+      background-color: #f0f0f0;
       border: none;
+      color: black;
+      padding: 12px;
+      margin: 8px auto;
+      width: 70%;
+      font-size: 1em;
       border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .option:hover {
+      background-color: #e0e0e0;
+    }
+    .correct {
+      background-color: #a8e6cf !important;
+    }
+    .wrong {
+      background-color: #ff8b94 !important;
+    }
+    #startBtn, #nextBtn, #retryBtn {
+      background-color: #000;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
       cursor: pointer;
       margin-top: 20px;
     }
-    button:hover {
-      background-color: #0369a1;
+    #trophy {
+      font-size: 4em;
+      margin-top: 10px;
     }
-    .quiz-container {
-      max-width: 700px;
+    #footer {
       margin-top: 40px;
-      display: none;
-    }
-    .question {
-      font-weight: bold;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      transition: background 0.3s;
-    }
-    .options div {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #f1f5f9;
-      color: black;
-      transition: 0.2s;
-    }
-    .options div:hover {
-      background-color: #bae6fd;
-    }
-    .correct { background-color: #86efac !important; }
-    .wrong { background-color: #fca5a5 !important; }
-    #result {
-      display: none;
-      text-align: center;
-      margin-top: 30px;
-    }
-    .trophy { font-size: 40px; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      font-size: 0.9em;
     }
   </style>
 </head>
 <body>
-  <div class="welcome">
-    <h1>🔥 Welcome to the Brevis Network Quiz!</h1>
-    <p>Learn. Play. Earn. Test your knowledge about Brevis Network 🚀</p>
-    <button id="startBtn">Start Quiz</button>
+  <div id="welcomeScreen">
+    <img id="logo" src="brevis-logo.png" alt="Brevis Logo">
+    <h1>Welcome to the Brevis Network Quiz!</h1>
+    <p>Learn about Brevis Network and Web3 — test your knowledge and win a virtual trophy! 🏆</p>
+    <button id="startBtn" onclick="startQuiz()">Start Quiz</button>
   </div>
 
-  <div class="quiz-container" id="quizContainer">
-    <h2 id="questionTitle"></h2>
-    <div class="options" id="options"></div>
+  <div id="quizScreen" style="display:none;">
+    <img id="logo" src="brevis-logo.png" alt="Brevis Logo">
+    <div id="questionContainer"></div>
+    <button id="nextBtn" style="display:none;" onclick="nextQuestion()">Next</button>
   </div>
 
-  <div id="result"></div>
+  <div id="resultScreen" style="display:none;">
+    <h1>Quiz Complete!</h1>
+    <div id="trophy"></div>
+    <p id="scoreText"></p>
+    <p>Thanks for exploring Brevis Network!</p>
+    <a href="https://blog.brevis.network" target="_blank">👉 Learn more at Brevis Network Blog</a>
+    <br>
+    <button id="retryBtn" onclick="retryQuiz()">Retry Quiz</button>
+  </div>
 
-<script>
-const colors = ["#fef08a", "#bbf7d0", "#bfdbfe", "#fecaca", "#e9d5ff", "#fed7aa"];
-const questions = [
-  {q: "What is Brevis Network primarily focused on?", options: ["DeFi Lending", "Cross-chain Proof System", "NFT Marketplace", "Gaming"], answer: 1},
-  {q: "Which technology powers Brevis proofs?", options: ["AI Learning", "Zero-Knowledge (ZK) tech", "Machine Proofing", "Quantum Hashing"], answer: 1},
-  {q: "Brevis helps developers access on-chain data with what?", options: ["Indexers", "ZK Coprocessor", "Smart Bridges", "APIs"], answer: 1},
-  {q: "Which chain ecosystem does Brevis belong to?", options: ["Ethereum", "Polygon", "ZetaChain", "All of the above"], answer: 3},
-  {q: "What’s Brevis Network’s main goal?", options: ["Increase fees", "Empower dApps via ZK proofs", "Centralize data", "Create games"], answer: 1},
-  {q: "What type of proofs does Brevis generate?", options: ["Visual", "Verifiable ZK Proofs", "Randomized", "Game-based"], answer: 1},
-  {q: "Developers can use Brevis for?", options: ["AI Training", "Cross-chain state verification", "Storage mining", "NFT minting"], answer: 1},
-  {q: "Which component acts as Brevis’s engine?", options: ["Brevis Coprocessor", "Brevis Mixer", "Data Scanner", "ZK Layer"], answer: 0},
-  {q: "Brevis enables apps to trustlessly read data from?", options: ["Web2 servers", "Multiple blockchains", "IPFS", "One chain only"], answer: 1},
-  {q: "What’s the advantage of ZK coprocessors like Brevis?", options: ["Less transparency", "Data verifiability & privacy", "Manual auditing", "Costly proofs"], answer: 1},
-  {q: "Who benefits most from Brevis?", options: ["Developers building DeFi/NFT apps", "Gamers", "Web2 brands", "Hardware miners"], answer: 0},
-  {q: "Brevis proofs are verified on-chain using?", options: ["Oracles", "ZK Verifiers", "APIs", "Validators"], answer: 1},
-  {q: "Which of the following is NOT a use case of Brevis?", options: ["DeFi rewards", "Cross-chain verification", "Off-chain gaming", "Credit scoring"], answer: 2},
-  {q: "What does ZK stand for in Brevis context?", options: ["Zero Knowledge", "Zone Keeper", "Zeta Key", "Zero Kernel"], answer: 0},
-  {q: "Brevis is designed to make blockchain data?", options: ["Harder to use", "Easier & verifiable", "Encrypted only", "Unstable"], answer: 1},
-];
+  <script>
+    const questions = [
+      { q: "What is Brevis Network primarily focused on?", options: ["Gaming", "On-chain data verification", "DeFi staking", "NFT trading"], answer: 1 },
+      { q: "Which blockchain ecosystem is Brevis built on?", options: ["Ethereum", "Polygon", "zkSync", "Solana"], answer: 2 },
+      { q: "What technology does Brevis use for data proofs?", options: ["Zero-Knowledge Proofs", "AI", "Smart Bots", "Sidechains"], answer: 0 },
+      { q: "Who can use Brevis to build apps?", options: ["Only developers", "Anyone", "Only institutions", "Miners"], answer: 1 },
+      { q: "What is Brevis’ mission?", options: ["To centralize data", "To make on-chain data verifiable and usable", "To create memes", "To track NFTs"], answer: 1 },
+      { q: "What makes Brevis different from other data tools?", options: ["It uses AI", "It’s powered by ZK proofs", "It has NFTs", "It’s off-chain only"], answer: 1 },
+      { q: "Which feature enables secure access to blockchain data?", options: ["Proof Aggregator", "ZK Verifier", "Node Fetcher", "Data Vault"], answer: 0 },
+      { q: "Brevis helps apps use data without compromising?", options: ["Speed", "Security", "Privacy", "Gas fees"], answer: 2 },
+      { q: "Developers can integrate Brevis through?", options: ["APIs & SDKs", "Manual coding", "Plugins", "Smart wallets"], answer: 0 },
+      { q: "Brevis works closely with which ecosystem partner?", options: ["zkSync", "Cardano", "Aptos", "Cosmos"], answer: 0 },
+      { q: "Which of these best describes Brevis Network?", options: ["ZK-powered data layer", "DEX", "Wallet", "NFT marketplace"], answer: 0 },
+      { q: "What kind of data can Brevis verify?", options: ["Off-chain only", "On-chain proofs", "Emails", "Tweets"], answer: 1 },
+      { q: "ZK stands for?", options: ["Zero-Knowledge", "Zone-Keeper", "Zen-Karma", "Zero-Kick"], answer: 0 },
+      { q: "Why is ZK technology important?", options: ["It adds privacy & trust", "It increases gas fees", "It stores memes", "It mines BTC"], answer: 0 },
+      { q: "Where can you learn more about Brevis?", options: ["YouTube", "Their Blog", "Reddit", "Facebook"], answer: 1 }
+    ];
 
-let current = 0, score = 0;
+    let current = 0;
+    let score = 0;
 
-document.getElementById('startBtn').addEventListener('click', () => {
-  document.querySelector('.welcome').style.display = 'none';
-  document.getElementById('quizContainer').style.display = 'block';
-  showQuestion();
-});
+    function startQuiz() {
+      document.getElementById("welcomeScreen").style.display = "none";
+      document.getElementById("quizScreen").style.display = "block";
+      showQuestion();
+    }
 
-function showQuestion() {
-  const q = questions[current];
-  const qDiv = document.getElementById('quizContainer');
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-  qDiv.style.backgroundColor = randomColor;
+    function showQuestion() {
+      const qContainer = document.getElementById("questionContainer");
+      const q = questions[current];
+      const colors = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff", "#a0c4ff", "#bdb2ff"];
+      qContainer.innerHTML = `
+        <div class="question" style="color:${colors[current % colors.length]}">${current + 1}. ${q.q}</div>
+        ${q.options.map((opt, i) => `<button class="option" onclick="selectOption(${i})">${String.fromCharCode(65 + i)}. ${opt}</button>`).join('')}
+      `;
+    }
 
-  document.getElementById('questionTitle').innerHTML = `<strong>${current+1}. ${q.q}</strong>`;
-  const optsDiv = document.getElementById('options');
-  optsDiv.innerHTML = "";
-  q.options.forEach((opt, i) => {
-    const optDiv = document.createElement('div');
-    optDiv.textContent = `${String.fromCharCode(65+i)}. ${opt}`;
-    optDiv.onclick = () => selectOption(i, optDiv);
-    optsDiv.appendChild(optDiv);
-  });
-}
+    function selectOption(i) {
+      const q = questions[current];
+      const options = document.querySelectorAll(".option");
+      options.forEach(btn => btn.disabled = true);
+      if (i === q.answer) {
+        options[i].classList.add("correct");
+        score++;
+      } else {
+        options[i].classList.add("wrong");
+        options[q.answer].classList.add("correct");
+      }
+      document.getElementById("nextBtn").style.display = "block";
+    }
 
-function selectOption(i, el) {
-  const q = questions[current];
-  const opts = document.querySelectorAll('#options div');
-  opts.forEach(o => o.onclick = null); // lock options
-  if (i === q.answer) {
-    el.classList.add('correct');
-    score++;
-  } else {
-    el.classList.add('wrong');
-    opts[q.answer].classList.add('correct');
-  }
-  setTimeout(() => nextQuestion(), 1200);
-}
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        document.getElementById("nextBtn").style.display = "none";
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
 
-function nextQuestion() {
-  current++;
-  if (current < questions.length) {
-    showQuestion();
-  } else {
-    showResult();
-  }
-}
+    function finishQuiz() {
+      document.getElementById("quizScreen").style.display = "none";
+      document.getElementById("resultScreen").style.display = "block";
+      let trophy = "😅";
+      if (score >= 12) trophy = "🏆 Gold Trophy!";
+      else if (score >= 8) trophy = "🥈 Silver Trophy!";
+      else if (score >= 5) trophy = "🥉 Bronze Trophy!";
+      else trophy = "❌ Try Again!";
+      document.getElementById("trophy").innerText = trophy;
+      document.getElementById("scoreText").innerText = `You scored ${score} out of ${questions.length}`;
+    }
 
-function showResult() {
-  document.getElementById('quizContainer').style.display = 'none';
-  const resDiv = document.getElementById('result');
-  resDiv.style.display = 'block';
-  let trophy = "🔁";
-  if (score >= 12) trophy = "🏆";
-  else if (score >= 8) trophy = "🥈";
-  else trophy = "🔁";
-  resDiv.innerHTML = `<h2>Your Score: ${score} / ${questions.length}</h2>
-                      <div class="trophy">${trophy}</div>
-                      <button onclick="retry()">Retry Quiz</button>`;
-}
-
-function retry() {
-  score = 0;
-  current = 0;
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('quizContainer').style.display = 'block';
-  showQuestion();
-}
-</script>
+    function retryQuiz() {
+      score = 0;
+      current = 0;
+      document.getElementById("resultScreen").style.display = "none";
+      document.getElementById("quizScreen").style.display = "block";
+      showQuestion();
+    }
+  </script>
 </body>
 </html>
