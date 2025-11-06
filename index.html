@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import logo from "./assets/brevis-logo.png";
 
 const quizData = [
   { question: "What is Brevis Network known for?", options: ["AI Models", "ZK Data Verification", "NFT Market", "Layer 1 Blockchain"], answer: "ZK Data Verification" },
@@ -8,15 +7,15 @@ const quizData = [
   { question: "Who can use Brevis SDK?", options: ["Only enterprises", "Anyone building dApps", "Only students", "Only investors"], answer: "Anyone building dApps" },
   { question: "Which ecosystem supports Brevis?", options: ["Ethereum", "Polygon", "Both", "None"], answer: "Both" },
   { question: "What makes Brevis unique?", options: ["Fast transactions", "Zero-Knowledge proofs", "Low gas fees", "AI Integration"], answer: "Zero-Knowledge proofs" },
-  { question: "What is Brevis main mission?", options: ["Provide scalable NFTs", "Enable trustless computation", "Create L2 chains", "Build AI bots"], answer: "Enable trustless computation" },
   { question: "Does Brevis focus on privacy?", options: ["Yes", "No", "Sometimes", "Not Sure"], answer: "Yes" },
-  { question: "What kind of apps can use Brevis?", options: ["Web3 apps", "Mobile only", "Banking apps", "Gaming consoles"], answer: "Web3 apps" },
   { question: "Is Brevis open-source?", options: ["Yes", "No"], answer: "Yes" },
   { question: "What layer does Brevis operate on?", options: ["Layer 1", "Layer 2", "Cross-layer"], answer: "Cross-layer" },
-  { question: "Does Brevis use zkSNARKs?", options: ["Yes", "No"], answer: "Yes" },
+  { question: "Brevis Network official website?", options: ["brevis.io", "blog.brevis.network", "brevischain.com", "zkbrevis.org"], answer: "blog.brevis.network" },
   { question: "Which part of blockchain does Brevis optimize?", options: ["Frontend", "Computation layer", "UX", "Storage"], answer: "Computation layer" },
   { question: "Who benefits from Brevis?", options: ["Developers", "Users", "Enterprises", "All of the above"], answer: "All of the above" },
-  { question: "Brevis Network official website?", options: ["brevis.io", "blog.brevis.network", "brevischain.com", "zkbrevis.org"], answer: "blog.brevis.network" },
+  { question: "Brevis mission focuses on?", options: ["Gaming", "Trustless computation", "AI Art", "NFT Design"], answer: "Trustless computation" },
+  { question: "Does Brevis support zkSNARKs?", options: ["Yes", "No"], answer: "Yes" },
+  { question: "Where can you learn more about Brevis?", options: ["Twitter", "Discord", "blog.brevis.network", "All of these"], answer: "All of these" },
 ];
 
 export default function App() {
@@ -32,7 +31,7 @@ export default function App() {
       setSelected("");
       if (index + 1 < quizData.length) setIndex(index + 1);
       else setIndex(quizData.length);
-    }, 800);
+    }, 700);
   };
   const resetQuiz = () => {
     setIndex(-1);
@@ -40,26 +39,23 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-800 px-4">
+    <div style={{ backgroundColor: "white", minHeight: "100vh" }} className="flex flex-col items-center justify-center text-gray-800 px-4">
       {index === -1 ? (
-        <div className="text-center animate-fade-in">
-          <img src={logo} alt="Brevis Logo" className="w-24 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold mb-2 text-blue-700">Welcome to Brevis Quiz</h1>
+        <div className="text-center">
+          <img src="/brevis.png" alt="Brevis Logo" className="w-24 mx-auto mb-4" />
+          <h1 className="text-4xl font-bold text-blue-700 mb-2">🔥 Welcome to Brevis Quiz 🔥</h1>
           <p className="text-lg mb-6">Learn about the Brevis Network 🚀</p>
-          <button
-            onClick={startQuiz}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition"
-          >
+          <button onClick={startQuiz} className="bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition">
             Start Quiz
           </button>
         </div>
       ) : index < quizData.length ? (
-        <div className="text-center animate-fade-in">
-          <img src={logo} alt="Brevis" className="w-16 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-4">
-            Question {index + 1} of {quizData.length}
+        <div className="text-center">
+          <img src="/brevis.png" alt="Brevis Logo" className="w-16 mx-auto mb-3" />
+          <h2 className="text-xl font-semibold mb-2">
+            Question {index + 1} / {quizData.length}
           </h2>
-          <p className="text-2xl mb-6">{quizData[index].question}</p>
+          <p className="text-2xl mb-5">{quizData[index].question}</p>
           <div className="grid gap-3">
             {quizData[index].options.map((opt, i) => (
               <button
@@ -81,18 +77,18 @@ export default function App() {
           </div>
         </div>
       ) : (
-        <div className="text-center animate-fade-in">
-          <img src={logo} alt="Brevis" className="w-24 mx-auto mb-4" />
+        <div className="text-center">
+          <img src="/brevis.png" alt="Brevis Logo" className="w-24 mx-auto mb-4" />
           <h2 className="text-3xl font-bold mb-2">Quiz Completed 🎉</h2>
           <p className="text-xl mb-4">Your Score: {score} / {quizData.length}</p>
           <p className="text-lg text-gray-700 mb-4">
-            Brevis Network is revolutionizing how developers access and verify on-chain data with <strong>Zero-Knowledge Proofs</strong>.  
-            Explore more at 👉 <a href="https://blog.brevis.network" className="text-blue-600 underline" target="_blank" rel="noreferrer">brevis.network</a>
+            💡 Brevis Network is revolutionizing on-chain data access using <strong>Zero-Knowledge Proofs</strong>.<br />
+            Learn more:{" "}
+            <a href="https://blog.brevis.network" target="_blank" rel="noreferrer" className="text-blue-600 underline">
+              blog.brevis.network
+            </a>
           </p>
-          <button
-            onClick={resetQuiz}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
-          >
+          <button onClick={resetQuiz} className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">
             Retry Quiz
           </button>
         </div>
