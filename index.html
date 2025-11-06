@@ -1,146 +1,227 @@
-import React, { useState } from "react";
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Brevis Network Quiz</title>
+<style>
+  :root{
+    --bg: #ffffff;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #0ea5e9;
+    --text: #111827;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Roboto,"Helvetica Neue",Arial;}
+  .page{min-height:100%;display:flex;align-items:center;justify-content:center;padding:36px;}
+  .card{width:100%;max-width:880px;background:var(--card);border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,.06);padding:28px;box-sizing:border-box;text-align:center;}
+  /* header / logo */
+  .logoBox{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:6px}
+  .logoIcon{width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#f3f4f6;color:#111;font-weight:800;font-size:28px}
+  h1{margin:6px 0;font-size:28px;color:var(--text);font-weight:800}
+  p.lead{margin:0;color:var(--muted);font-size:15px}
 
-const questions = [
-  { question: "What is Brevis Network?", options: ["A gaming project", "A ZK data verification platform", "An NFT marketplace", "A social media app"], answer: "A ZK data verification platform" },
-  { question: "Which technology powers Brevis Network?", options: ["Zero Knowledge Proofs", "AI Bots", "Smart NFTs", "IoT Systems"], answer: "Zero Knowledge Proofs" },
-  { question: "What is the main focus of Brevis?", options: ["DeFi loans", "Verifiable computation and privacy", "Memecoin trading", "AI art creation"], answer: "Verifiable computation and privacy" },
-  { question: "Brevis enables applications to access what type of data?", options: ["Off-chain data", "On-chain verified data", "Random external files", "Private user chats"], answer: "On-chain verified data" },
-  { question: "Where can you read about Brevis updates?", options: ["blog.brevis.network", "reddit.com/brevis", "facebook.com/brevis", "medium.com/brevis"], answer: "blog.brevis.network" },
-  { question: "Who are the primary users of Brevis SDK?", options: ["Developers", "Gamers", "Streamers", "Artists"], answer: "Developers" },
-  { question: "Which ecosystem does Brevis support?", options: ["Only Ethereum", "Multi-chain (Ethereum, Polygon, etc.)", "Only Solana", "Only Binance Chain"], answer: "Multi-chain (Ethereum, Polygon, etc.)" },
-  { question: "What layer does Brevis primarily operate on?", options: ["Layer 1", "Layer 2", "Cross Layer", "App Layer"], answer: "Cross Layer" },
-  { question: "What kind of proofs does Brevis use?", options: ["zkSNARKs", "zkRollup", "zkMESH", "zkWASM"], answer: "zkSNARKs" },
-  { question: "What is the end goal of Brevis?", options: ["Trustless computation", "Centralized analytics", "Trading bots", "AI assistants"], answer: "Trustless computation" },
-  { question: "Is Brevis open source?", options: ["Yes", "No"], answer: "Yes" },
-  { question: "What powers Brevis verification system?", options: ["ZK cryptography", "Data mining", "GPU rendering", "Cloud computing"], answer: "ZK cryptography" },
-  { question: "Brevis helps developers prove what?", options: ["Any data truthfully without revealing everything", "Social media followers", "Game scores", "Image filters"], answer: "Any data truthfully without revealing everything" },
-  { question: "Which term defines Brevis data layer?", options: ["Proof-of-Data", "Zero-Layer", "Smart-Layer", "Meta-Layer"], answer: "Proof-of-Data" },
-  { question: "What is the main vision of Brevis Network?", options: ["To enable trustless, verifiable computation for all apps", "To create gaming metaverse", "To build meme tokens", "To automate NFTs"], answer: "To enable trustless, verifiable computation for all apps" },
-];
+  /* welcome */
+  .welcome{padding:28px}
+  .startBtn{margin-top:18px;padding:12px 20px;background:var(--text);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700}
+  .startBtn:hover{opacity:.95}
 
-const colors = [
-  "text-blue-700", "text-green-700", "text-purple-700",
-  "text-pink-700", "text-orange-700", "text-indigo-700",
-  "text-teal-700", "text-rose-700", "text-cyan-700"
-];
+  /* quiz */
+  .quizWrap{display:none}
+  .qLogo{width:48px;height:48px;margin:8px auto;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .questionTitle{font-size:20px;font-weight:800;margin:18px 0;padding:14px 16px;border-radius:10px}
+  .options{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px}
+  .optBtn{
+    width:84%;max-width:620px;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);
+    background:#f8fafc;color:#000;font-weight:700;cursor:pointer;font-size:15px;
+  }
+  .optBtn:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(2,6,23,0.04)}
+  .optBtn.locked{pointer-events:none;opacity:0.9}
+  .optBtn.correct{background:#dcfce7;border-color:#86efac;color:#064e3b}
+  .optBtn.wrong{background:#fee2e2;border-color:#fca5a5;color:#7f1d1d}
 
-export default function App() {
-  const [currentQuestion, setCurrentQuestion] = useState(-1);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [score, setScore] = useState(0);
-  const [locked, setLocked] = useState(false);
+  .controls{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:18px}
+  .nextBtn{display:none;padding:10px 16px;background:var(--accent);color:#022;border:none;border-radius:10px;cursor:pointer;font-weight:700}
+  .nextBtn:disabled{opacity:.6;cursor:not-allowed}
 
-  const handleAnswer = (option) => {
-    if (locked) return;
-    setSelectedOption(option);
-    setLocked(true);
-    if (option === questions[currentQuestion].answer) {
-      setScore(score + 1);
-    }
-  };
+  /* result */
+  .resultWrap{display:none;padding:12px}
+  .scoreBox{font-weight:800;font-size:20px;color:var(--text)}
+  .trophy{font-size:44px;margin-top:12px}
+  .projectNote{margin-top:14px;color:var(--muted);font-size:15px}
+  .link{color:var(--accent);text-decoration:none;font-weight:700}
 
-  const nextQuestion = () => {
-    setSelectedOption(null);
-    setLocked(false);
-    if (currentQuestion + 1 < questions.length) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setCurrentQuestion(questions.length);
-    }
-  };
-
-  const restartQuiz = () => {
-    setCurrentQuestion(-1);
-    setScore(0);
-    setSelectedOption(null);
-    setLocked(false);
-  };
-
-  const getTrophy = () => {
-    if (score >= 12) return "🥇 Gold Trophy - Brevis Expert!";
-    if (score >= 8) return "🥈 Silver Trophy - Great Job!";
-    return "🔁 Try Again - Keep Learning!";
-  };
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-800 p-4">
-      {currentQuestion === -1 ? (
-        <div className="text-center">
-          <h1 className="text-5xl font-extrabold text-blue-700 mb-4">🎯 Brevis Network Quiz 🎯</h1>
-          <p className="text-lg mb-6 font-medium">
-            Learn about the <strong>Brevis Network</strong> and explore its ZK-powered world!
-          </p>
-          <button
-            onClick={() => setCurrentQuestion(0)}
-            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-blue-700 transition font-semibold"
-          >
-            Start Quiz
-          </button>
+  /* responsive */
+  @media (max-width:520px){
+    .optBtn{width:94%}
+    h1{font-size:22px}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="card" role="main">
+      <!-- Welcome -->
+      <div id="welcome" class="welcome">
+        <div class="logoBox">
+          <div class="logoIcon">B</div>
         </div>
-      ) : currentQuestion < questions.length ? (
-        <div className="w-full max-w-xl text-center">
-          <h2 className={`text-2xl font-bold mb-6 ${colors[currentQuestion % colors.length]}`}>
-            {currentQuestion + 1}. {questions[currentQuestion].question}
-          </h2>
-          <div className="grid gap-3">
-            {questions[currentQuestion].options.map((opt, i) => (
-              <button
-                key={i}
-                onClick={() => handleAnswer(opt)}
-                disabled={locked}
-                className={`px-5 py-3 rounded-xl border text-lg font-medium transition ${
-                  selectedOption
-                    ? opt === questions[currentQuestion].answer
-                      ? "bg-green-500 text-white"
-                      : opt === selectedOption
-                      ? "bg-red-500 text-white"
-                      : "bg-white text-black"
-                    : "bg-white hover:bg-blue-50 text-black"
-                }`}
-              >
-                {String.fromCharCode(65 + i)}. {opt}
-              </button>
-            ))}
-          </div>
+        <h1>🎯 Brevis Network Quiz</h1>
+        <p class="lead">Learn about Brevis Network — verifiable on-chain data with Zero-Knowledge proofs.</p>
+        <p class="lead" style="margin-top:8px;font-weight:600">Start with a quick challenge — 15 questions. Win a trophy based on your score!</p>
+        <button id="startBtn" class="startBtn" aria-label="Start quiz">Start Quiz</button>
+      </div>
 
-          {locked && (
-            <p className="mt-3 text-sm text-gray-600">
-              ✅ Correct Answer: <strong>{questions[currentQuestion].answer}</strong>
-            </p>
-          )}
+      <!-- Quiz -->
+      <div id="quiz" class="quizWrap" aria-hidden="true">
+        <div class="qLogo">B</div>
+        <div id="questionTitle" class="questionTitle"></div>
+        <div id="options" class="options" role="list"></div>
 
-          <button
-            onClick={nextQuestion}
-            className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition"
-          >
-            {currentQuestion + 1 === questions.length ? "Finish" : "Next"}
-          </button>
+        <div class="controls">
+          <button id="nextBtn" class="nextBtn">Next</button>
         </div>
-      ) : (
-        <div className="text-center">
-          <h2 className="text-4xl font-bold mb-3">🎉 Quiz Completed!</h2>
-          <p className="text-xl mb-2 font-semibold">Your Score: {score} / {questions.length}</p>
-          <p className="text-2xl mb-4">{getTrophy()}</p>
-          <p className="text-gray-700 mb-6">
-            💡 Brevis Network is pioneering <strong>trustless, verifiable computation</strong> using ZK tech.<br />
-            Learn more at 👉{" "}
-            <a
-              href="https://blog.brevis.network"
-              target="_blank"
-              rel="noreferrer"
-              className="text-blue-600 underline"
-            >
-              blog.brevis.network
-            </a>
-          </p>
-          <button
-            onClick={restartQuiz}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition"
-          >
-            Retry Quiz
-          </button>
+      </div>
+
+      <!-- Result -->
+      <div id="result" class="resultWrap" aria-hidden="true">
+        <div id="scoreBox" class="scoreBox"></div>
+        <div id="trophy" class="trophy"></div>
+        <div class="projectNote" id="projectNote"></div>
+        <p style="margin-top:14px"><a class="link" href="https://blog.brevis.network" target="_blank" rel="noopener">Read more on Brevis Blog →</a></p>
+        <div style="margin-top:16px">
+          <button id="retryBtn" class="startBtn">Retry Quiz</button>
         </div>
-      )}
+      </div>
     </div>
-  );
+  </div>
+
+<script>
+/* Quiz data (15 Brevis-related questions) */
+const QUESTIONS = [
+  {q:"What is Brevis Network primarily focused on?", opts:["Gaming","On-chain data verification","Social media","Centralized exchange"], a:1},
+  {q:"Which technology powers Brevis proofs?", opts:["AI models","Zero-Knowledge (ZK) proofs","2FA tokens","Plain hashing"], a:1},
+  {q:"Brevis helps developers access what kind of data?", opts:["Private chats","Unverified off-chain data","Verifiable on-chain data","Random files"], a:2},
+  {q:"Where can you read official Brevis updates?", opts:["blog.brevis.network","facebook.com","instagram.com","myspace.com"], a:0},
+  {q:"Brevis aims to make data that is:", opts:["Hidden to all","Proven and private","Public only","Encrypted only"], a:1},
+  {q:"Which term best describes Brevis layer?", opts:["NFT marketplace","ZK-powered data layer","Liquidity pool","Payment gateway"], a:1},
+  {q:"Developers integrate Brevis typically via:", opts:["SDKs & APIs","Manual FTP","Email forms","Paper mail"], a:0},
+  {q:"Brevis is useful for verifying:", opts:["On-chain state across chains","Only images","Only videos","Only email addresses"], a:0},
+  {q:"Brevis helps with data while preserving:", opts:["Maximum spam","User privacy and minimal reveal","High fees","Slow speed"], a:1},
+  {q:"Which of the following is a key benefit of Brevis?", opts:["Increased opacity","Verifiable proofs without exposing data","Forced centralization","Manual audits only"], a:1},
+  {q:"Brevis often works with which cryptographic family?", opts:["Symmetric keys only","Zero-knowledge cryptography","Classical ciphers","Plaintext hashing"], a:1},
+  {q:"A common short name for Brevis use is:", opts:["Proof-of-Data","TokenSwap","MetaGame","CloudDrive"], a:0},
+  {q:"Which audience gains most from Brevis SDK?", opts:["Developers building dApps","Only gamers","Only artists","Only miners"], a:0},
+  {q:"Brevis improves app UX by:", opts:["Forcing users to re-login","Providing verifiable data flows","Blocking cross-chain","Hiding transactions"], a:1},
+  {q:"Where is best place to learn technical docs for Brevis?", opts:["blog.brevis.network/docs or official docs page","Random forums","Private chats","Old printed books"], a:0}
+];
+
+/* utilities */
+const colors = ["#ef4444","#f97316","#f59e0b","#10b981","#06b6d4","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
+
+let idx = 0, score = 0;
+
+/* DOM refs */
+const elWelcome = document.getElementById('welcome');
+const elStart = document.getElementById('startBtn');
+const elQuiz = document.getElementById('quiz');
+const elQuestionTitle = document.getElementById('questionTitle');
+const elOptions = document.getElementById('options');
+const elNext = document.getElementById('nextBtn');
+const elResult = document.getElementById('result');
+const elScoreBox = document.getElementById('scoreBox');
+const elTrophy = document.getElementById('trophy');
+const elProjectNote = document.getElementById('projectNote');
+const elRetry = document.getElementById('retryBtn');
+
+function startQuiz(){
+  elWelcome.style.display = 'none';
+  elQuiz.style.display = 'block';
+  idx = 0; score = 0;
+  renderQuestion();
 }
+
+elStart.addEventListener('click', startQuiz);
+
+function renderQuestion(){
+  const q = QUESTIONS[idx];
+  // random color for question title
+  const color = colors[idx % colors.length];
+  elQuestionTitle.style.background = 'transparent';
+  elQuestionTitle.style.color = color;
+  elQuestionTitle.textContent = `${idx+1}. ${q.q}`;
+  elOptions.innerHTML = '';
+  // create options A-D with black text
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'optBtn option';
+    btn.style.display = 'block';
+    btn.innerText = `${String.fromCharCode(65 + i)}. ${opt}`;
+    btn.style.color = '#000';
+    btn.onclick = () => onSelect(i, btn);
+    elOptions.appendChild(btn);
+  });
+  elNext.style.display = 'none';
+}
+
+function onSelect(chosen, btn){
+  // lock all options
+  const nodes = elOptions.querySelectorAll('.option');
+  nodes.forEach(n => { n.classList.add('locked'); n.onclick = null; });
+  const q = QUESTIONS[idx];
+  // mark selection
+  if(chosen === q.a){
+    // correct
+    nodes[chosen].classList.add('correct');
+    score++;
+  } else {
+    // wrong chosen
+    nodes[chosen].classList.add('wrong');
+    // reveal correct
+    nodes[q.a].classList.add('correct');
+  }
+  // show Next button
+  elNext.style.display = 'inline-block';
+  elNext.disabled = false;
+}
+
+elNext.addEventListener('click', () => {
+  idx++;
+  if(idx < QUESTIONS.length){
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+});
+
+function finishQuiz(){
+  elQuiz.style.display = 'none';
+  elResult.style.display = 'block';
+  elScoreBox.textContent = `You scored ${score} out of ${QUESTIONS.length}`;
+  // trophy logic
+  if(score >= 12){
+    elTrophy.textContent = '🏆 Gold Trophy — Brevis Expert!';
+  } else if(score >= 8){
+    elTrophy.textContent = '🥈 Silver Trophy — Great Job!';
+  } else if(score >= 5){
+    elTrophy.textContent = '🥉 Bronze — Keep Learning!';
+  } else {
+    elTrophy.textContent = '🔁 Try Again — You can do it!';
+  }
+  // short project blurb
+  elProjectNote.innerHTML = `Brevis Network enables trustless, verifiable on-chain data using Zero-Knowledge proofs — empowering developers to build private & provable apps.`;
+}
+
+elRetry.addEventListener('click', () => {
+  elResult.style.display = 'none';
+  elQuiz.style.display = 'block';
+  idx = 0; score = 0;
+  renderQuestion();
+});
+
+/* start hidden state fix */
+elQuiz.style.display = 'none';
+elResult.style.display = 'none';
+</script>
+</body>
+</html>
